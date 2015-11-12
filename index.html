@@ -8,12 +8,280 @@
 </head>
 
 <body>
-
+  <div id="container"></div>
   <script type="text/javascript" src="js/jquery-2.0.0.min.js"></script>
-  <script type="text/javascript" src="js/three.min.js"></script>
-  <script type="text/javascript" src="js/OrbitControls.js"></script>
+  <script type="text/javascript" src="js/threeJS/build/three.min.js"></script>
+  <script type="text/javascript" src="js/threeJS/examples/js/controls/OrbitControls.js"></script>
+  <script type="text/javascript" src="js/threeJS/examples/js/controls/TrackballControls.js"></script>
+  <script type="text/javascript" src="js/threeJS/examples/js/Detector.js"></script>
+  <script type="text/javascript" src="js/threeJS/examples/js/GPUParticleSystem.js"></script>
+  <script type="text/javascript" src="js/threeJS/examples/js/libs/stats.min.js"></script>
+  <script type="text/javascript" src="js/dat.gui.min.js"></script>
   <script type="text/javascript" src="js/visualizer.js"></script>
   <script type="text/javascript" src="js/audio.js"></script>
+
+<script>
+
+// *****************************************************************
+
+var SCREEN_WIDTH = window.innerWidth,
+SCREEN_HEIGHT = window.innerHeight,
+mouseX = 0, mouseY = 0,
+
+windowHalfX = window.innerWidth / 2,
+windowHalfY = window.innerHeight / 2,
+
+SEPARATION = 200,
+AMOUNTX = 10,
+AMOUNTY = 10,
+camera, container, tick = 0, clock = new THREE.Clock(true), controls, scene, renderer, stats, gui = new dat.GUI(), options, spawnerOptions, particleSystem, cubeMesh;
+
+init();
+animate();
+
+// *****************************************************************
+// Initialization
+
+function init() {
+  var separation = 100, amountX = 50, amountY = 50, particles, particle;
+
+  // Camera
+  camera = new THREE.PerspectiveCamera( 75, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 10000 );
+  camera.position.z = 500;
+
+  // Scene
+
+  scene = new THREE.Scene();
+  scene.fog = new THREE.FogExp2( 0xcccccc, 0.002 );
+
+  // Renderer
+
+  renderer = new THREE.WebGLRenderer();
+  renderer.setClearColor( scene.fog.color );
+  renderer.setPixelRatio( window.devicePixelRatio );
+  renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
+  container = document.getElementById( 'container' );
+  container.appendChild( renderer.domElement );
+
+  // *****************************************************************
+  // Orbit Controls
+
+  // controls = new THREE.OrbitControls( camera, renderer.domElement );
+  // //controls.addEventListener( 'change', render ); // add this only if there is no animation loop (requestAnimationFrame)
+  // controls.enableDamping = true;
+  // controls.dampingFactor = 0.25;
+  // controls.enableZoom = true;
+
+  // *****************************************************************
+  // Particles
+
+  var PI2 = Math.PI * 2;
+  // The GPU Particle system extends THREE.Object3D, and so you can use it
+  // as you would any other scene graph component.  Particle positions will be
+  // relative to the position of the particle system, but you will probably only need one
+  // system for your whole scene
+  particleSystem = new THREE.GPUParticleSystem({
+    maxParticles: 250000
+  });
+  scene.add( particleSystem);
+
+  options = {
+    position: new THREE.Vector3(),
+    positionRandomness: .3,
+    velocity: new THREE.Vector3(),
+    velocityRandomness: .5,
+    color: 0xaa88ff,
+    colorRandomness: .2,
+    turbulence: .5,
+    lifetime: 2,
+    size: 10,
+    sizeRandomness: 1
+  };
+
+  spawnerOptions = {
+    spawnRate: 150000,
+    horizontalSpeed: 1.5,
+    verticalSpeed: 1.55,
+    timeScale: 1
+  };
+
+  // *****************************************************************
+  // GUI
+
+  // gui.add(options, "velocityRandomness", 0, 3);
+  // gui.add(options, "positionRandomness", 0, 3);
+  // gui.add(options, "size", 1, 20);
+  // gui.add(options, "sizeRandomness", 0, 25);
+  // gui.add(options, "colorRandomness", 0, 1);
+  // gui.add(options, "lifetime", .1, 10);
+  // gui.add(options, "turbulence", 0, 1);
+
+  // gui.add(spawnerOptions, "spawnRate", 10, 30000);
+  // gui.add(spawnerOptions, "timeScale", -1, 1);
+
+  // *****************************************************************
+  // Trackball Controls
+
+  controls = new THREE.TrackballControls(camera, renderer.domElement);
+  controls.rotateSpeed = 5.0;
+  controls.zoomSpeed = 2.2;
+  controls.panSpeed = 1;
+  controls.dynamicDampingFactor = 0.3;
+
+  // Lines
+  for (var i = 0; i < 300; i++) {
+    var geometry = new THREE.Geometry();
+    var vertex = new THREE.Vector3(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1);
+    vertex.normalize();
+    vertex.multiplyScalar(450);
+
+    geometry.vertices.push(vertex);
+
+    var vertex2 = vertex.clone();
+    vertex2.multiplyScalar(Math.random() * 0.3 + 1);
+
+    geometry.vertices.push(vertex2);
+
+    var line = new THREE.Line(geometry, new THREE.LineBasicMaterial({ color: 0xffffff, opacity: Math.random() }));
+    scene.add(line);
+  }
+
+  // Polygons
+
+  // var geometry = new THREE.CylinderGeometry( 0, 10, 30, 4, 1 );
+  // var material =  new THREE.MeshPhongMaterial( { color:0xffffff, shading: THREE.FlatShading } );
+
+  // for ( var i = 0; i < 100; i ++ ) {
+  //   var mesh = new THREE.Mesh( geometry, material );
+  //   mesh.position.x = ( Math.random() - 0.5 ) * 1000;
+  //   mesh.position.y = ( Math.random() - 0.5 ) * 1000;
+  //   mesh.position.z = ( Math.random() - 0.5 ) * 1000;
+  //   mesh.updateMatrix();
+  //   mesh.matrixAutoUpdate = false;
+  //   scene.add( mesh );
+  // }
+
+  // Cubes
+
+  for ( var i = 0; i < 314; i ++ ) {
+    var cubeGeometry = new THREE.CubeGeometry(15, 15, 15);
+    var cubeMaterial = new THREE.MeshPhongMaterial({
+      color: randomFairColor(),
+      specular: 0xffffff,
+      shininess: 20,
+      reflectivity: 5.5,
+      // wireframe: true
+    });
+
+    cubeMesh = new THREE.Mesh( cubeGeometry, cubeMaterial );
+    cubeMesh.position.x = ( Math.random() - 0.5 ) * 1000;
+    cubeMesh.position.y = ( Math.random() - 0.5 ) * 1000;
+    cubeMesh.position.z = ( Math.random() - 0.5 ) * 1000;
+    cubeMesh.updateMatrix();
+    cubeMesh.matrixAutoUpdate = false;
+    scene.add( cubeMesh );
+  }
+
+  // *****************************************************************
+  // Lights
+
+  light = new THREE.DirectionalLight( 0xffffff );
+  light.position.set( 1, 1, 1 );
+  scene.add( light );
+
+  light = new THREE.DirectionalLight( 0x002288 );
+  light.position.set( -1, -1, -1 );
+  scene.add( light );
+
+  light = new THREE.AmbientLight( 0x222222 );
+  scene.add( light );
+
+  // *****************************************************************
+  // Stats
+
+  stats = new Stats();
+  stats.domElement.style.position = 'absolute';
+  stats.domElement.style.top = '0px';
+  stats.domElement.style.zIndex = 100;
+  container.appendChild( stats.domElement );
+
+  // document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+  window.addEventListener( 'resize', onWindowResize, false );
+
+}
+
+// *****************************************************************
+// Event Handlers
+
+function onWindowResize() {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize( window.innerWidth, window.innerHeight );
+}
+
+function onDocumentMouseMove(event) {
+  mouseX = event.clientX - windowHalfX;
+  mouseY = event.clientY - windowHalfY;
+}
+
+function randomFairColor() {
+ var min = 64;
+ var max = 224;
+ var r = (Math.floor(Math.random() * (max - min + 1)) + min) * 65536;
+ var g = (Math.floor(Math.random() * (max - min + 1)) + min) * 256;
+ var b = (Math.floor(Math.random() * (max - min + 1)) + min);
+ return r + g + b;
+}
+
+// *****************************************************************
+// Animation
+
+function animate() {
+  requestAnimationFrame( animate );
+  controls.update();
+  stats.update();
+
+  // if(typeof array === 'object' && array.length > 0) {
+  //   var k = 0;
+  //   for(var i = 0; i < cubes.length; i++) {
+  //     for(var j = 0; j < cubes[i].length; j++) {
+  //       var scale = (array[k] + boost) / 30;
+  //       cubes[i][j].position.z = (scale < 1 ? 1 : scale);
+  //       cubes[i][j].scale.x = array[k] * 0.05;
+  //       // k += (k < array.length ? 1 : 0);
+  //     }
+  //   }
+  // }
+
+  // Variable time-step
+  var delta = clock.getDelta() * spawnerOptions.timeScale;
+  tick += delta;
+
+  if (tick < 0) tick = 0;
+  if (delta > 0) {
+    // options.position.x = Math.sin(tick * spawnerOptions.horizontalSpeed) * 20;
+    // options.position.y = Math.sin(tick * spawnerOptions.verticalSpeed) * 10;
+    // options.position.z = Math.sin(tick * spawnerOptions.horizontalSpeed + spawnerOptions.verticalSpeed) * 5;
+
+    // for (var x = 0; x < spawnerOptions.spawnRate * delta; x++) {
+    //   // Yep, that's really it.  Spawning particles is super cheap, and once you spawn them, the rest of
+    //   // their lifecycle is handled entirely on the GPU, driven by a time uniform updated below
+    //   particleSystem.spawnParticle(options);
+    // }
+  }
+  particleSystem.update(tick);
+  render();
+}
+
+function render() {
+  // camera.position.x += ( mouseX - camera.position.x ) * .05;
+  // camera.position.y += ( - mouseY + 200 - camera.position.y ) * .05;
+  camera.lookAt( scene.position );
+  renderer.render( scene, camera );
+}
+
+// *****************************************************************
+</script>
 
 </body>
 </html>
