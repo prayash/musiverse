@@ -35,6 +35,17 @@ SEPARATION = 200,
 AMOUNTX = 10,
 AMOUNTY = 10,
 camera, container, tick = 0, clock = new THREE.Clock(true), controls, scene, renderer, stats, gui = new dat.GUI(), options, spawnerOptions, particleSystem, cubeMesh;
+var cubes = [];
+
+//////////////settings/////////
+var movementSpeed = 80;
+var totalObjects = 1000;
+var objectSize = 10;
+var sizeRandomness = 4000;
+var colors = [0xFF0FFF, 0xCCFF00, 0xFF000F, 0x996600, 0xFFFFFF];
+/////////////////////////////////
+var dirs = [];
+var parts = [];
 
 init();
 animate();
@@ -46,22 +57,22 @@ function init() {
   var separation = 100, amountX = 50, amountY = 50, particles, particle;
 
   // Camera
-  camera = new THREE.PerspectiveCamera( 75, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 10000 );
+  camera = new THREE.PerspectiveCamera(75, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 10000);
   camera.position.z = 500;
 
   // Scene
 
   scene = new THREE.Scene();
-  scene.fog = new THREE.FogExp2( 0xcccccc, 0.002 );
+  scene.fog = new THREE.FogExp2(0xcccccc, 0.002);
 
   // Renderer
 
   renderer = new THREE.WebGLRenderer();
-  renderer.setClearColor( scene.fog.color );
-  renderer.setPixelRatio( window.devicePixelRatio );
-  renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
-  container = document.getElementById( 'container' );
-  container.appendChild( renderer.domElement );
+  renderer.setClearColor(scene.fog.color);
+  renderer.setPixelRatio(window.devicePixelRatio);
+  renderer.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
+  container = document.getElementById('container');
+  container.appendChild(renderer.domElement);
 
   // *****************************************************************
   // Orbit Controls
@@ -80,30 +91,30 @@ function init() {
   // as you would any other scene graph component.  Particle positions will be
   // relative to the position of the particle system, but you will probably only need one
   // system for your whole scene
-  particleSystem = new THREE.GPUParticleSystem({
-    maxParticles: 250000
-  });
-  scene.add( particleSystem);
+  // particleSystem = new THREE.GPUParticleSystem({
+  //   maxParticles: 250000
+  // });
+  // scene.add( particleSystem);
 
-  options = {
-    position: new THREE.Vector3(),
-    positionRandomness: .3,
-    velocity: new THREE.Vector3(),
-    velocityRandomness: .5,
-    color: 0xaa88ff,
-    colorRandomness: .2,
-    turbulence: .5,
-    lifetime: 2,
-    size: 10,
-    sizeRandomness: 1
-  };
+  // options = {
+  //   position: new THREE.Vector3(),
+  //   positionRandomness: .3,
+  //   velocity: new THREE.Vector3(),
+  //   velocityRandomness: .5,
+  //   color: 0xaa88ff,
+  //   colorRandomness: .2,
+  //   turbulence: .5,
+  //   lifetime: 2,
+  //   size: 10,
+  //   sizeRandomness: 1
+  // };
 
-  spawnerOptions = {
-    spawnRate: 150000,
-    horizontalSpeed: 1.5,
-    verticalSpeed: 1.55,
-    timeScale: 1
-  };
+  // spawnerOptions = {
+  //   spawnRate: 150000,
+  //   horizontalSpeed: 1.5,
+  //   verticalSpeed: 1.55,
+  //   timeScale: 1
+  // };
 
   // *****************************************************************
   // GUI
@@ -134,12 +145,10 @@ function init() {
     var vertex = new THREE.Vector3(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1);
     vertex.normalize();
     vertex.multiplyScalar(450);
-
     geometry.vertices.push(vertex);
 
     var vertex2 = vertex.clone();
     vertex2.multiplyScalar(Math.random() * 0.3 + 1);
-
     geometry.vertices.push(vertex2);
 
     var line = new THREE.Line(geometry, new THREE.LineBasicMaterial({ color: 0xffffff, opacity: Math.random() }));
@@ -162,39 +171,37 @@ function init() {
   // }
 
   // Cubes
-
-  for ( var i = 0; i < 314; i ++ ) {
+  for ( var i = 0; i < 314; i++ ) {
     var cubeGeometry = new THREE.CubeGeometry(15, 15, 15);
     var cubeMaterial = new THREE.MeshPhongMaterial({
       color: randomFairColor(),
       specular: 0xffffff,
       shininess: 20,
-      reflectivity: 5.5,
-      // wireframe: true
+      reflectivity: 2.5,
+      shading: THREE.FlatShading
     });
 
-    cubeMesh = new THREE.Mesh( cubeGeometry, cubeMaterial );
-    cubeMesh.position.x = ( Math.random() - 0.5 ) * 1000;
-    cubeMesh.position.y = ( Math.random() - 0.5 ) * 1000;
-    cubeMesh.position.z = ( Math.random() - 0.5 ) * 1000;
-    cubeMesh.updateMatrix();
-    cubeMesh.matrixAutoUpdate = false;
-    scene.add( cubeMesh );
+    cubes[i] = new THREE.Mesh(cubeGeometry, cubeMaterial);
+    cubes[i].position.x = (Math.random() - 0.5) * 1000;
+    cubes[i].position.y = (Math.random() - 0.5) * 1000;
+    cubes[i].position.z = (Math.random() - 0.5) * 1000;
+    cubes[i].updateMatrix();
+    scene.add(cubes[i]);
   }
 
   // *****************************************************************
   // Lights
 
-  light = new THREE.DirectionalLight( 0xffffff );
+  light = new THREE.DirectionalLight(0xffffff);
   light.position.set( 1, 1, 1 );
-  scene.add( light );
+  scene.add(light);
 
-  light = new THREE.DirectionalLight( 0x002288 );
+  light = new THREE.DirectionalLight(0x002288);
   light.position.set( -1, -1, -1 );
-  scene.add( light );
+  scene.add(light);
 
-  light = new THREE.AmbientLight( 0x222222 );
-  scene.add( light );
+  light = new THREE.AmbientLight(0x222222);
+  scene.add(light);
 
   // *****************************************************************
   // Stats
@@ -206,8 +213,59 @@ function init() {
   container.appendChild( stats.domElement );
 
   // document.addEventListener( 'mousemove', onDocumentMouseMove, false );
-  window.addEventListener( 'resize', onWindowResize, false );
+  window.addEventListener('resize', onWindowResize, false);
+  window.addEventListener( 'mousedown', onclick, false );
 
+}
+
+// *****************************************************************
+// Animation
+
+function animate() {
+  var delta = clock.getDelta();
+  controls.update(delta);
+  stats.update();
+  
+  var pCount = parts.length;
+  while(pCount--) {
+    parts[pCount].update();
+  }
+  
+  tick += delta;
+  if (tick < 0) tick = 0;
+  if (delta > 0) {
+    // options.position.x = Math.sin(tick * spawnerOptions.horizontalSpeed) * 20;
+    // options.position.y = Math.sin(tick * spawnerOptions.verticalSpeed) * 10;
+    // options.position.z = Math.sin(tick * spawnerOptions.horizontalSpeed + spawnerOptions.verticalSpeed) * 5;
+
+    // for (var x = 0; x < spawnerOptions.spawnRate * delta; x++) {
+    //   // Yep, that's really it.  Spawning particles is super cheap, and once you spawn them, the rest of
+    //   // their lifecycle is handled entirely on the GPU, driven by a time uniform updated below
+    //   particleSystem.spawnParticle(options);
+    // }
+
+    if(typeof array === 'object' && array.length > 0) {
+      var k = 0;
+      for(var i = 0; i < cubes.length; i++) {
+        var scale = (array[k] + boost) / 30;
+        // cubes[i].position.x = (scale < 1 ? 1 : scale);
+        cubes[i].scale.x = array[k] * 0.025;
+        k += (k < array.length ? 1 : 0);
+        // parts.push(new ExplodeAnimation(0, 0));
+      }
+    }
+  }
+
+  // particleSystem.update(tick);
+  render();
+  requestAnimationFrame(animate);
+}
+
+function render() {
+  // camera.position.x += ( mouseX - camera.position.x ) * .05;
+  // camera.position.y += ( - mouseY + 200 - camera.position.y ) * .05;
+  camera.lookAt(scene.position);
+  renderer.render(scene, camera);
 }
 
 // *****************************************************************
@@ -224,63 +282,59 @@ function onDocumentMouseMove(event) {
   mouseY = event.clientY - windowHalfY;
 }
 
+function onclick(){
+  event.preventDefault();
+  parts.push(new ExplodeAnimation((Math.random() * sizeRandomness)-(sizeRandomness/2), (Math.random() * sizeRandomness)-(sizeRandomness/2)));
+}
+
 function randomFairColor() {
- var min = 64;
- var max = 224;
- var r = (Math.floor(Math.random() * (max - min + 1)) + min) * 65536;
- var g = (Math.floor(Math.random() * (max - min + 1)) + min) * 256;
- var b = (Math.floor(Math.random() * (max - min + 1)) + min);
- return r + g + b;
+  var min = 64;
+  var max = 224;
+  var r = (Math.floor(Math.random() * (max - min + 1)) + min) * 65536;
+  var g = (Math.floor(Math.random() * (max - min + 1)) + min) * 256;
+  var b = (Math.floor(Math.random() * (max - min + 1)) + min);
+  return r + g + b;
 }
 
-// *****************************************************************
-// Animation
 
-function animate() {
-  requestAnimationFrame( animate );
-  controls.update();
-  stats.update();
-
-  // if(typeof array === 'object' && array.length > 0) {
-  //   var k = 0;
-  //   for(var i = 0; i < cubes.length; i++) {
-  //     for(var j = 0; j < cubes[i].length; j++) {
-  //       var scale = (array[k] + boost) / 30;
-  //       cubes[i][j].position.z = (scale < 1 ? 1 : scale);
-  //       cubes[i][j].scale.x = array[k] * 0.05;
-  //       // k += (k < array.length ? 1 : 0);
-  //     }
-  //   }
-  // }
-
-  // Variable time-step
-  var delta = clock.getDelta() * spawnerOptions.timeScale;
-  tick += delta;
-
-  if (tick < 0) tick = 0;
-  if (delta > 0) {
-    // options.position.x = Math.sin(tick * spawnerOptions.horizontalSpeed) * 20;
-    // options.position.y = Math.sin(tick * spawnerOptions.verticalSpeed) * 10;
-    // options.position.z = Math.sin(tick * spawnerOptions.horizontalSpeed + spawnerOptions.verticalSpeed) * 5;
-
-    // for (var x = 0; x < spawnerOptions.spawnRate * delta; x++) {
-    //   // Yep, that's really it.  Spawning particles is super cheap, and once you spawn them, the rest of
-    //   // their lifecycle is handled entirely on the GPU, driven by a time uniform updated below
-    //   particleSystem.spawnParticle(options);
-    // }
+function ExplodeAnimation(x, y) {
+  var geometry = new THREE.Geometry();
+  
+  for (i = 0; i < totalObjects; i ++) { 
+    var vertex = new THREE.Vector3();
+    vertex.x = x;
+    vertex.y = y;
+    vertex.z = 0;
+  
+    geometry.vertices.push( vertex );
+    dirs.push({x:(Math.random() * movementSpeed)-(movementSpeed/2),y:(Math.random() * movementSpeed)-(movementSpeed/2),z:(Math.random() * movementSpeed)-(movementSpeed/2)});
   }
-  particleSystem.update(tick);
-  render();
+  var material = new THREE.ParticleBasicMaterial( { size: objectSize,  color: colors[Math.round(Math.random() * colors.length)] });
+  var particles = new THREE.ParticleSystem( geometry, material );
+  
+  this.object = particles;
+  this.status = true;
+  
+  this.xDir = (Math.random() * movementSpeed)-(movementSpeed/2);
+  this.yDir = (Math.random() * movementSpeed)-(movementSpeed/2);
+  this.zDir = (Math.random() * movementSpeed)-(movementSpeed/2);
+  
+  scene.add( this.object  ); 
+  
+  this.update = function(){
+    if (this.status == true){
+      var pCount = totalObjects;
+      while(pCount--) {
+        var particle =  this.object.geometry.vertices[pCount]
+        particle.y += dirs[pCount].y;
+        particle.x += dirs[pCount].x;
+        particle.z += dirs[pCount].z;
+      }
+      this.object.geometry.verticesNeedUpdate = true;
+    }
+  }
 }
 
-function render() {
-  // camera.position.x += ( mouseX - camera.position.x ) * .05;
-  // camera.position.y += ( - mouseY + 200 - camera.position.y ) * .05;
-  camera.lookAt( scene.position );
-  renderer.render( scene, camera );
-}
-
-// *****************************************************************
 </script>
 
 </body>
