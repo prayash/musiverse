@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
   <title>Synesthesia Simulation</title>
   <link href="http://fonts.googleapis.com/css?family=Raleway:200,300" rel="stylesheet" type="text/css" />
   <link href="css/stylesheet.css" rel="stylesheet" type="text/css" />
@@ -59,11 +60,13 @@ function init() {
   // Camera
   camera = new THREE.PerspectiveCamera(75, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 10000);
   camera.position.z = 500;
+  camera.position.y = 300;
+  camera.position.x = 300;
 
   // Scene
 
   scene = new THREE.Scene();
-  scene.fog = new THREE.FogExp2(0xcccccc, 0.002);
+  scene.fog = new THREE.FogExp2(0xCCCCC, 0.0015);
 
   // Renderer
 
@@ -200,6 +203,10 @@ function init() {
   light.position.set( -1, -1, -1 );
   scene.add(light);
 
+  light = new THREE.DirectionalLight(0x002288);
+  light.position.set( -1, -1, 1 );
+  scene.add(light);
+
   light = new THREE.AmbientLight(0x222222);
   scene.add(light);
 
@@ -230,7 +237,7 @@ function animate() {
   while(pCount--) {
     parts[pCount].update();
   }
-  
+
   tick += delta;
   if (tick < 0) tick = 0;
   if (delta > 0) {
@@ -250,6 +257,8 @@ function animate() {
         var scale = (array[k] + boost) / 30;
         // cubes[i].position.x = (scale < 1 ? 1 : scale);
         cubes[i].scale.x = array[k] * 0.025;
+        cubes[i].scale.z = array[k] * 0.025;
+        cubes[i].scale.z = array[k] * 0.025;
         k += (k < array.length ? 1 : 0);
         // parts.push(new ExplodeAnimation(0, 0));
       }
