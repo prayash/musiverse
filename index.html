@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-  <title>Synesthesia Simulation</title>
+  <title>Musiverse by Prayash Thapa</title>
   <link href="http://fonts.googleapis.com/css?family=Raleway:200,300" rel="stylesheet" type="text/css" />
   <link href="css/stylesheet.css" rel="stylesheet" type="text/css" />
 </head>
@@ -11,12 +11,12 @@
 <body>
   <div id="container"></div>
   <script type="text/javascript" src="js/jquery-2.0.0.min.js"></script>
-  <script type="text/javascript" src="js/threeJS/build/three.min.js"></script>
-  <script type="text/javascript" src="js/threeJS/examples/js/controls/OrbitControls.js"></script>
-  <script type="text/javascript" src="js/threeJS/examples/js/controls/TrackballControls.js"></script>
-  <script type="text/javascript" src="js/threeJS/examples/js/Detector.js"></script>
-  <script type="text/javascript" src="js/threeJS/examples/js/GPUParticleSystem.js"></script>
-  <script type="text/javascript" src="js/threeJS/examples/js/libs/stats.min.js"></script>
+  <script type="text/javascript" src="js/threeJS/three.min.js"></script>
+  <script type="text/javascript" src="js/threeJS/OrbitControls.js"></script>
+  <script type="text/javascript" src="js/threeJS/TrackballControls.js"></script>
+  <script type="text/javascript" src="js/threeJS/Detector.js"></script>
+  <script type="text/javascript" src="js/threeJS/GPUParticleSystem.js"></script>
+  <script type="text/javascript" src="js/threeJS/libs/stats.min.js"></script>
   <script type="text/javascript" src="js/dat.gui.min.js"></script>
   <script type="text/javascript" src="js/visualizer.js"></script>
   <script type="text/javascript" src="js/audio.js"></script>
@@ -90,34 +90,6 @@ function init() {
   // Particles
 
   var PI2 = Math.PI * 2;
-  // The GPU Particle system extends THREE.Object3D, and so you can use it
-  // as you would any other scene graph component.  Particle positions will be
-  // relative to the position of the particle system, but you will probably only need one
-  // system for your whole scene
-  // particleSystem = new THREE.GPUParticleSystem({
-  //   maxParticles: 250000
-  // });
-  // scene.add( particleSystem);
-
-  // options = {
-  //   position: new THREE.Vector3(),
-  //   positionRandomness: .3,
-  //   velocity: new THREE.Vector3(),
-  //   velocityRandomness: .5,
-  //   color: 0xaa88ff,
-  //   colorRandomness: .2,
-  //   turbulence: .5,
-  //   lifetime: 2,
-  //   size: 10,
-  //   sizeRandomness: 1
-  // };
-
-  // spawnerOptions = {
-  //   spawnRate: 150000,
-  //   horizontalSpeed: 1.5,
-  //   verticalSpeed: 1.55,
-  //   timeScale: 1
-  // };
 
   // *****************************************************************
   // GUI
@@ -241,16 +213,6 @@ function animate() {
   tick += delta;
   if (tick < 0) tick = 0;
   if (delta > 0) {
-    // options.position.x = Math.sin(tick * spawnerOptions.horizontalSpeed) * 20;
-    // options.position.y = Math.sin(tick * spawnerOptions.verticalSpeed) * 10;
-    // options.position.z = Math.sin(tick * spawnerOptions.horizontalSpeed + spawnerOptions.verticalSpeed) * 5;
-
-    // for (var x = 0; x < spawnerOptions.spawnRate * delta; x++) {
-    //   // Yep, that's really it.  Spawning particles is super cheap, and once you spawn them, the rest of
-    //   // their lifecycle is handled entirely on the GPU, driven by a time uniform updated below
-    //   particleSystem.spawnParticle(options);
-    // }
-
     if(typeof array === 'object' && array.length > 0) {
       var k = 0;
       for(var i = 0; i < cubes.length; i++) {
@@ -303,45 +265,6 @@ function randomFairColor() {
   var g = (Math.floor(Math.random() * (max - min + 1)) + min) * 256;
   var b = (Math.floor(Math.random() * (max - min + 1)) + min);
   return r + g + b;
-}
-
-
-function ExplodeAnimation(x, y) {
-  var geometry = new THREE.Geometry();
-  
-  for (i = 0; i < totalObjects; i ++) { 
-    var vertex = new THREE.Vector3();
-    vertex.x = x;
-    vertex.y = y;
-    vertex.z = 0;
-  
-    geometry.vertices.push( vertex );
-    dirs.push({x:(Math.random() * movementSpeed)-(movementSpeed/2),y:(Math.random() * movementSpeed)-(movementSpeed/2),z:(Math.random() * movementSpeed)-(movementSpeed/2)});
-  }
-  var material = new THREE.ParticleBasicMaterial( { size: objectSize,  color: colors[Math.round(Math.random() * colors.length)] });
-  var particles = new THREE.ParticleSystem( geometry, material );
-  
-  this.object = particles;
-  this.status = true;
-  
-  this.xDir = (Math.random() * movementSpeed)-(movementSpeed/2);
-  this.yDir = (Math.random() * movementSpeed)-(movementSpeed/2);
-  this.zDir = (Math.random() * movementSpeed)-(movementSpeed/2);
-  
-  scene.add( this.object  ); 
-  
-  this.update = function(){
-    if (this.status == true){
-      var pCount = totalObjects;
-      while(pCount--) {
-        var particle =  this.object.geometry.vertices[pCount]
-        particle.y += dirs[pCount].y;
-        particle.x += dirs[pCount].x;
-        particle.z += dirs[pCount].z;
-      }
-      this.object.geometry.verticesNeedUpdate = true;
-    }
-  }
 }
 
 </script>
