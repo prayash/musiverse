@@ -9,15 +9,41 @@ var windowHalfY           = SCREEN_HEIGHT / 2;
 var camera, container, tick = 0, clock = new THREE.Clock(true), controls, scene, renderer, stats;
 
 var cubes = [];
-var icosahedron;
+var icosahedron, icosFrame;
 
 var palette = ["#ECF0F1", "#7877f9", "#3498DB", "#ffa446"];
+
+var scaleArray = [60, 62, 64, 65, 67, 69, 71, 72];
+var note = 0;
+
+var osc = new p5.SinOsc();
+var envelope = new p5.Env();
+var fft = new p5.FFT();
+var amplitude = new p5.Amplitude();
+var reverb = new p5.Reverb();
+var spectrum, waveform;
 
 // ********************************************************************************
 
 function init() {
   // ******************************************************************************
   // - Initialization
+
+  envelope.setADSR(0.1, 0.5, 0.1, 0.5);
+  envelope.setRange(1, 0);
+
+  reverb.process(osc, 3, 2);
+  osc.amp(envelope);
+  osc.start();
+
+  // for (var i = 0; i < scaleArray.length; i++) {
+  //   var midiValue = scaleArray[1];
+  //   var freqValue = midiToFreq(midiValue);
+  //   osc.freq(freqValue);
+  //
+  //   envelope.play(osc, 0, 0.1);
+  //   // note = (note + 1) % scaleArray.length;
+  // }
 
   // * Camera
   camera = new THREE.PerspectiveCamera(75, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 5000);
@@ -68,7 +94,7 @@ function init() {
       linewidth: Math.random(3),
       transparent: true,
       fog: true,
-      opacity: Math.random(0.75)
+      opacity: 0.25
     }));
     scene.add(line);
   }
@@ -159,6 +185,12 @@ function init() {
 // - Animation
 
 function render() {
+  // * Analysis Parameters
+  spectrum = fft.analyze();
+  waveform = fft.waveform();
+  volume = 0.005 + amplitude.getLevel() * 10;
+  console.log(volume);
+
   var delta = clock.getDelta();
   controls.update(delta);
   stats.update();
@@ -166,21 +198,20 @@ function render() {
   tick += delta;
   if (tick < 0) tick = 0;
   if (delta > 0) {
-    if(typeof array === 'object' && array.length > 0) {
-      var k = 0;
-      for(var i = 0; i < cubes.length; i++) {
-        var scale = (array[k] + boost) / 30;
-        // cubes[i].position.x = (scale < 1 ? 1 : scale);
-        cubes[i].scale.x = array[k] * 0.025 + 0.05;
-        cubes[i].scale.z = array[k] * 0.025 + 0.05;
-        cubes[i].scale.z = array[k] * 0.025 + 0.05;
+    for(var i = 0; i < cubes.length; i++) {
+      cubes[i].scale.x = 1 + volume * 0.25;
+      cubes[i].scale.y = 1 + volume * 0.5;
+      cubes[i].scale.z = 1 + volume * 0.75;
 
-        icosahedron.scale.x = array[k] * 20 + 1;
-        icosahedron.scale.y = array[k] * 20 + 1;
-        icosahedron.scale.z = array[k] * 20 + 1;
-        icosahedron.rotation.x += 0.00001 + (array[k] * 0.00000025);
-        k += (k < array.length ? 1 : 0);
-      }
+      icosahedron.scale.x = 1 + volume * 0.05;
+      icosahedron.scale.y = 1 + volume * 0.05;
+      icosahedron.scale.z = 1 + volume * 0.05;
+      icosahedron.rotation.x += 0.00001 + (volume * 0.00000025);
+
+      icosFrame.scale.x = 1 + volume * 0.05;
+      icosFrame.scale.y = 1 + volume * 0.05;
+      icosFrame.scale.z = 1 + volume * 0.05;
+      icosFrame.rotation.x += 0.00001 + (volume * 0.00000025);
     }
   }
 
@@ -192,13 +223,15 @@ function render() {
 
   // * ¡Loop!
   requestAnimationFrame(render);
+
+  document.addEventListener('touchstart', onTouchStart);
+  window.addEventListener('resize', onWindowResize);
+  window.addEventListener('mousedown', onclick);
+  document.addEventListener( 'mouseup', onMouseUp);
 }
 
 // ******************************************************************************
 // - Events
-
-window.addEventListener('resize', onWindowResize, true);
-window.addEventListener( 'mousedown', onclick, true );
 
 function onWindowResize() {
   camera.aspect = window.innerWidth / window.innerHeight;
@@ -208,7 +241,22 @@ function onWindowResize() {
 
 function onclick() {
   // event.preventDefault();
-  source.stop();
+  // source.stop();
+}
+
+function onMouseUp(event) {
+  envelope.play(osc, 0, 0.1);
+}
+
+function onTouchStart(event) {
+  if (event.touches.length === 1) {
+    event.preventDefault();
+    envelope.play(osc, 0, 0.1);
+  }
+}
+
+Number.prototype.map = function (in_min, in_max, out_min, out_max) {
+  return (this - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
 
 // ******************************************************************************
