@@ -12,29 +12,24 @@ AMOUNTX = 10,
 AMOUNTY = 10,
 camera, container, tick = 0, clock = new THREE.Clock(true), controls, scene, renderer, stats, options, spawnerOptions, particleSystem, cubeMesh;
 var cubes = [];
-
-init();
-render();
-
-// *****************************************************************
-// * Initialization
+var icosahedron;
+var palette = ["#ECF0F1", "#7877f9", "#3498DB", "#ffa446"];
 
 function init() {
-  var separation = 100, amountX = 50, amountY = 50, particles, particle;
+  // *****************************************************************
+  // - Initialization
 
   // * Camera
-  camera = new THREE.PerspectiveCamera(75, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 10000);
-  camera.position.z = 500;
-  camera.position.y = 300;
+  camera = new THREE.PerspectiveCamera(75, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 5000);
+  camera.position.z = 800;
+  camera.position.y = 500;
   camera.position.x = 300;
 
   // * Scene
-
   scene = new THREE.Scene();
-  scene.fog = new THREE.FogExp2(0xCCCCC, 0.0015);
+  scene.fog = new THREE.FogExp2(0x7aa8f8, 0.00105); // 0xCCCCC
 
   // * Renderer
-
   renderer = new THREE.WebGLRenderer({ antialias: true });
   renderer.setClearColor(scene.fog.color);
   renderer.setPixelRatio(window.devicePixelRatio);
@@ -43,13 +38,20 @@ function init() {
   container.appendChild(renderer.domElement);
 
   // *****************************************************************
-  // Trackball Controls
+  // - Trackball Controls
 
   controls = new THREE.TrackballControls(camera, renderer.domElement);
   controls.rotateSpeed = 2.0;
-  controls.zoomSpeed = 2.2;
+  controls.zoomSpeed = 1;
   controls.panSpeed = 1;
-  controls.dynamicDampingFactor = 0.3;
+  controls.dampingFactor = 0.3;
+  controls.minDistance = 80;
+  controls.maxDistance = 1000;
+  this.autoRotate = true;
+  this.autoRotateSpeed = 2.0;
+
+  // *****************************************************************
+  // - Visuals
 
   // * Lines
   for (var i = 0; i < 300; i++) {
@@ -68,39 +70,38 @@ function init() {
   }
 
   // * Icosahedron
-  var geometry = new THREE.OctahedronGeometry(200, 2)
-  geometry.colorsNeedUpdate = true;
-  var material = new THREE.MeshPhongMaterial({
-    color: '#DC5978',
+  var icosGeometry = new THREE.OctahedronGeometry(350, 2)
+  icosGeometry.colorsNeedUpdate = true;
+  var icosMaterial = new THREE.MeshPhongMaterial({
+    color: '#d92b6a',
     shading: THREE.FlatShading,
     vertexColors: THREE.FaceColors
   });
-  var ico01 = new THREE.Mesh(geometry, material);
-  scene.add(ico01);
+  icosahedron = new THREE.Mesh(icosGeometry, icosMaterial);
+  scene.add(icosahedron);
 
-  // Polygons
+  // * Polygons
 
-  // var geometry = new THREE.CylinderGeometry( 0, 10, 30, 4, 1 );
-  // var material =  new THREE.MeshPhongMaterial( { color:0xffffff, shading: THREE.FlatShading } );
-  //
-  // for ( var i = 0; i < 100; i ++ ) {
-  //   var mesh = new THREE.Mesh( geometry, material );
-  //   mesh.position.x = ( Math.random() - 0.5 ) * 1000;
-  //   mesh.position.y = ( Math.random() - 0.5 ) * 1000;
-  //   mesh.position.z = ( Math.random() - 0.5 ) * 1000;
-  //   mesh.updateMatrix();
-  //   mesh.matrixAutoUpdate = false;
-  //   scene.add( mesh );
-  // }
+  var polyGeometry = new THREE.CylinderGeometry( 0, 10, 20, 4, 1 );
+  var polyMaterial =  new THREE.MeshPhongMaterial( { color:0xffffff, shading: THREE.FlatShading } );
+  for ( var i = 0; i < 100; i ++ ) {
+    var mesh = new THREE.Mesh( polyGeometry, polyMaterial );
+    mesh.position.x = ( Math.random() - 0.5 ) * 1000;
+    mesh.position.y = ( Math.random() - 0.5 ) * 1000;
+    mesh.position.z = ( Math.random() - 0.5 ) * 1000;
+    mesh.updateMatrix();
+    // mesh.matrixAutoUpdate = false;
+    // scene.add(mesh);
+  }
 
-  // Cubes
+  // * Cubes
   for ( var i = 0; i < 255; i++ ) {
     var cubeGeometry = new THREE.CubeGeometry(15, 15, 15);
     var cubeMaterial = new THREE.MeshPhongMaterial({
-      color: randomFairColor(),
+      color: palette[Math.floor(Math.random() * palette.length)],
       specular: 0xffffff,
       shininess: 20,
-      reflectivity: 2.5,
+      reflectivity: 1.5,
       shading: THREE.FlatShading
     });
 
@@ -113,25 +114,25 @@ function init() {
   }
 
   // *****************************************************************
-  // Lights
+  // - Lights
 
   light = new THREE.DirectionalLight(0xffffff);
   light.position.set( 1, 1, 1 );
   scene.add(light);
 
   light = new THREE.DirectionalLight(0x002288);
-  light.position.set( -1, -1, -1 );
-  scene.add(light);
-
-  light = new THREE.DirectionalLight(0x002288);
-  light.position.set( -1, -1, 1 );
+  light.position.set( -5, -1, -10 );
   scene.add(light);
 
   light = new THREE.AmbientLight(0x222222);
   scene.add(light);
 
+  var pointLight = new THREE.PointLight( "#ffffff", 1.2, 200 );
+  pointLight.position.set( 100, 100, 100 );
+  scene.add( pointLight );
+
   // *****************************************************************
-  // Stats
+  // - Stats
 
   stats = new Stats();
   stats.domElement.style.position = 'absolute';
@@ -145,7 +146,7 @@ function init() {
 }
 
 // *****************************************************************
-// Animation
+// - Animation
 
 function render() {
   var delta = clock.getDelta();
@@ -163,21 +164,28 @@ function render() {
         cubes[i].scale.x = array[k] * 0.025 + 0.05;
         cubes[i].scale.z = array[k] * 0.025 + 0.05;
         cubes[i].scale.z = array[k] * 0.025 + 0.05;
+
+        icosahedron.scale.x = array[k] * 20 + 1;
+        icosahedron.scale.y = array[k] * 20 + 1;
+        icosahedron.scale.z = array[k] * 20 + 1;
+        icosahedron.rotation.x += 0.00001 + (array[k] * 0.0000025);
         k += (k < array.length ? 1 : 0);
       }
     }
   }
+
 
   // camera.position.x += ( mouseX - camera.position.x ) * .05;
   // camera.position.y += ( - mouseY + 200 - camera.position.y ) * .05;
   camera.lookAt(scene.position);
   renderer.render(scene, camera);
 
+  // * ¡Loop!
   requestAnimationFrame(render);
 }
 
 // *****************************************************************
-// Event Handlers
+// - Events
 
 function onWindowResize() {
   camera.aspect = window.innerWidth / window.innerHeight;
@@ -194,11 +202,8 @@ function onclick(){
   event.preventDefault();
 }
 
-function randomFairColor() {
-  var min = 64;
-  var max = 224;
-  var r = (Math.floor(Math.random() * (max - min + 1)) + min) * 65536;
-  var g = (Math.floor(Math.random() * (max - min + 1)) + min) * 256;
-  var b = (Math.floor(Math.random() * (max - min + 1)) + min);
-  return r + g + b;
-}
+// *****************************************************************
+// - Init
+
+init();
+render();
