@@ -65,7 +65,11 @@ function init() {
     vertex2.multiplyScalar(Math.random() * 0.3 + 1);
     geometry.vertices.push(vertex2);
 
-    var line = new THREE.Line(geometry, new THREE.LineBasicMaterial({ color: 0xffffff, opacity: Math.random() }));
+    var line = new THREE.Line(geometry, new THREE.LineBasicMaterial({
+      color: 0xffffff,
+      transparent: true,
+      opacity: Math.random(1)
+    }));
     scene.add(line);
   }
 
