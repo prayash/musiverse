@@ -1,22 +1,22 @@
-// *****************************************************************
+// ********************************************************************************
 
-var SCREEN_WIDTH = window.innerWidth,
-SCREEN_HEIGHT = window.innerHeight,
-mouseX = 0, mouseY = 0,
+var SCREEN_WIDTH          = window.innerWidth;
+var SCREEN_HEIGHT         = window.innerHeight;
+var windowHalfX           = SCREEN_WIDTH / 2;
+var windowHalfY           = SCREEN_HEIGHT / 2;
 
-windowHalfX = window.innerWidth / 2,
-windowHalfY = window.innerHeight / 2,
+var mouseX = 0, mouseY = 0;
+var camera, container, tick = 0, clock = new THREE.Clock(true), controls, scene, renderer, stats;
 
-SEPARATION = 200,
-AMOUNTX = 10,
-AMOUNTY = 10,
-camera, container, tick = 0, clock = new THREE.Clock(true), controls, scene, renderer, stats;
 var cubes = [];
 var icosahedron;
+
 var palette = ["#ECF0F1", "#7877f9", "#3498DB", "#ffa446"];
 
+// ********************************************************************************
+
 function init() {
-  // *****************************************************************
+  // ******************************************************************************
   // - Initialization
 
   // * Camera
@@ -37,7 +37,7 @@ function init() {
   container = document.getElementById('container');
   container.appendChild(renderer.domElement);
 
-  // *****************************************************************
+  // ******************************************************************************
   // - Trackball Controls
 
   controls = new THREE.TrackballControls(camera, renderer.domElement);
@@ -52,7 +52,7 @@ function init() {
   this.autoRotate = true;
   // this.autoRotateSpeed = 1.0;
 
-  // *****************************************************************
+  // ******************************************************************************
   // - Visuals
 
   // * Lines
@@ -88,8 +88,12 @@ function init() {
 
   // * Polygons
 
-  var polyGeometry = new THREE.CylinderGeometry( 0, 10, 20, 4, 1 );
-  var polyMaterial =  new THREE.MeshPhongMaterial( { color:0xffffff, shading: THREE.FlatShading } );
+  var polyGeometry = new THREE.CylinderGeometry(0, 10, 20, 4, 1);
+  var polyMaterial =  new THREE.MeshPhongMaterial({
+    color:0xffffff,
+    shading: THREE.FlatShading
+  });
+
   for ( var i = 0; i < 100; i ++ ) {
     var mesh = new THREE.Mesh( polyGeometry, polyMaterial );
     mesh.position.x = ( Math.random() - 0.5 ) * 1000;
@@ -119,7 +123,7 @@ function init() {
     scene.add(cubes[i]);
   }
 
-  // *****************************************************************
+  // ******************************************************************************
   // - Lights
 
   light = new THREE.DirectionalLight(0xffffff);
@@ -137,7 +141,7 @@ function init() {
   pointLight.position.set( 100, 100, 100 );
   scene.add( pointLight );
 
-  // *****************************************************************
+  // ******************************************************************************
   // - Stats
 
   stats = new Stats();
@@ -151,7 +155,7 @@ function init() {
   window.addEventListener( 'mousedown', onclick, false );
 }
 
-// *****************************************************************
+// ******************************************************************************
 // - Animation
 
 function render() {
@@ -190,7 +194,7 @@ function render() {
   requestAnimationFrame(render);
 }
 
-// *****************************************************************
+// ******************************************************************************
 // - Events
 
 function onWindowResize() {
@@ -204,11 +208,11 @@ function onDocumentMouseMove(event) {
   mouseY = event.clientY - windowHalfY;
 }
 
-function onclick(){
+function onclick() {
   event.preventDefault();
 }
 
-// *****************************************************************
+// ******************************************************************************
 // - Init
 
 init();
