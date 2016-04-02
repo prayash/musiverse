@@ -1,11 +1,11 @@
 // ********************************************************************************
+// - app.js
 
 var SCREEN_WIDTH          = window.innerWidth;
 var SCREEN_HEIGHT         = window.innerHeight;
 var windowHalfX           = SCREEN_WIDTH / 2;
 var windowHalfY           = SCREEN_HEIGHT / 2;
 
-var mouseX = 0, mouseY = 0;
 var camera, container, tick = 0, clock = new THREE.Clock(true), controls, scene, renderer, stats;
 
 var cubes = [];
@@ -69,7 +69,9 @@ function init() {
 
     var line = new THREE.Line(geometry, new THREE.LineBasicMaterial({
       color: 0xffffff,
+      linewidth: Math.random(3),
       transparent: true,
+      fog: true,
       opacity: Math.random(1)
     }));
     scene.add(line);
@@ -148,11 +150,7 @@ function init() {
   stats.domElement.style.position = 'absolute';
   stats.domElement.style.top = '0px';
   stats.domElement.style.zIndex = 100;
-  container.appendChild( stats.domElement );
-
-  // document.addEventListener( 'mousemove', onDocumentMouseMove, false );
-  window.addEventListener('resize', onWindowResize, false);
-  window.addEventListener( 'mousedown', onclick, false );
+  // container.appendChild( stats.domElement );
 }
 
 // ******************************************************************************
@@ -185,8 +183,8 @@ function render() {
   }
 
 
-  // camera.position.x += ( mouseX - camera.position.x ) * .05;
-  // camera.position.y += ( - mouseY + 200 - camera.position.y ) * .05;
+  camera.position.x += 0.75;
+  camera.position.y += 0.75;
   camera.lookAt(scene.position);
   renderer.render(scene, camera);
 
@@ -197,19 +195,19 @@ function render() {
 // ******************************************************************************
 // - Events
 
+// document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+window.addEventListener('resize', onWindowResize, false);
+window.addEventListener( 'mousedown', onclick, false );
+
 function onWindowResize() {
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
   renderer.setSize( window.innerWidth, window.innerHeight );
 }
 
-function onDocumentMouseMove(event) {
-  mouseX = event.clientX - windowHalfX;
-  mouseY = event.clientY - windowHalfY;
-}
-
 function onclick() {
-  event.preventDefault();
+  // event.preventDefault();
+  source.stop();
 }
 
 // ******************************************************************************
