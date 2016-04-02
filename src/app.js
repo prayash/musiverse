@@ -45,12 +45,8 @@ function init() {
   controls.zoomSpeed = 1;
   controls.panSpeed = 1;
   controls.dampingFactor = 0.3;
-  controls.minDistance = 80;
+  controls.minDistance = 600;
   controls.maxDistance = 1000;
-  this.enableRotate = true;
-	// this.rotateSpeed = 1.0;
-  this.autoRotate = true;
-  // this.autoRotateSpeed = 1.0;
 
   // ******************************************************************************
   // - Visuals
@@ -72,21 +68,26 @@ function init() {
       linewidth: Math.random(3),
       transparent: true,
       fog: true,
-      opacity: Math.random(1)
+      opacity: Math.random(0.75)
     }));
     scene.add(line);
   }
 
   // * Icosahedron
-  var icosGeometry = new THREE.OctahedronGeometry(350, 2)
-  icosGeometry.colorsNeedUpdate = true;
+  var icosGeometry = new THREE.OctahedronGeometry(350, 2);
+  var icosFrameGeom = new THREE.OctahedronGeometry(400, 2);
+  // icosGeometry.colorsNeedUpdate = true;
   var icosMaterial = new THREE.MeshPhongMaterial({
     color: '#d92b6a',
     shading: THREE.FlatShading,
     vertexColors: THREE.FaceColors
   });
+
+  var icosWire = new THREE.MeshPhongMaterial({ color: '#FFFFFF', transparent: true, opacity: 0.2, wireframe: true });
+
   icosahedron = new THREE.Mesh(icosGeometry, icosMaterial);
-  scene.add(icosahedron);
+  icosFrame = new THREE.Mesh(icosFrameGeom, icosWire);
+  scene.add(icosahedron); scene.add(icosFrame);
 
   // * Polygons
 
@@ -114,7 +115,8 @@ function init() {
       specular: 0xffffff,
       shininess: 20,
       reflectivity: 1.5,
-      shading: THREE.FlatShading
+      shading: THREE.FlatShading,
+      // wireframe: Math.random(1) > 0.8 ? true : false
     });
 
     cubes[i] = new THREE.Mesh(cubeGeometry, cubeMaterial);
@@ -195,14 +197,13 @@ function render() {
 // ******************************************************************************
 // - Events
 
-// document.addEventListener( 'mousemove', onDocumentMouseMove, false );
-window.addEventListener('resize', onWindowResize, false);
-window.addEventListener( 'mousedown', onclick, false );
+window.addEventListener('resize', onWindowResize, true);
+window.addEventListener( 'mousedown', onclick, true );
 
 function onWindowResize() {
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
-  renderer.setSize( window.innerWidth, window.innerHeight );
+  renderer.setSize(window.innerWidth, window.innerHeight);
 }
 
 function onclick() {
