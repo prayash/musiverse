@@ -10,7 +10,7 @@ windowHalfY = window.innerHeight / 2,
 SEPARATION = 200,
 AMOUNTX = 10,
 AMOUNTY = 10,
-camera, container, tick = 0, clock = new THREE.Clock(true), controls, scene, renderer, stats, options, spawnerOptions, particleSystem, cubeMesh;
+camera, container, tick = 0, clock = new THREE.Clock(true), controls, scene, renderer, stats;
 var cubes = [];
 var icosahedron;
 var palette = ["#ECF0F1", "#7877f9", "#3498DB", "#ffa446"];
@@ -22,12 +22,12 @@ function init() {
   // * Camera
   camera = new THREE.PerspectiveCamera(75, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 5000);
   camera.position.z = 800;
-  camera.position.y = 500;
-  camera.position.x = 300;
+  camera.position.y = windowHalfY;
+  camera.position.x = windowHalfX;
 
   // * Scene
   scene = new THREE.Scene();
-  scene.fog = new THREE.FogExp2(0x7aa8f8, 0.00105); // 0xCCCCC
+  scene.fog = new THREE.FogExp2(0x7aa8ff, 0.0011); // 0xCCCCC
 
   // * Renderer
   renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -47,8 +47,10 @@ function init() {
   controls.dampingFactor = 0.3;
   controls.minDistance = 80;
   controls.maxDistance = 1000;
+  this.enableRotate = true;
+	// this.rotateSpeed = 1.0;
   this.autoRotate = true;
-  this.autoRotateSpeed = 2.0;
+  // this.autoRotateSpeed = 1.0;
 
   // *****************************************************************
   // - Visuals
@@ -172,7 +174,7 @@ function render() {
         icosahedron.scale.x = array[k] * 20 + 1;
         icosahedron.scale.y = array[k] * 20 + 1;
         icosahedron.scale.z = array[k] * 20 + 1;
-        icosahedron.rotation.x += 0.00001 + (array[k] * 0.0000025);
+        icosahedron.rotation.x += 0.00001 + (array[k] * 0.00000025);
         k += (k < array.length ? 1 : 0);
       }
     }
