@@ -1,0 +1,29 @@
+{
+  "name": "musiverse",
+  "version": "1.0.0",
+  "description": "Musiverse is an audio reactive musical toy made by Prayash Thapa (effulgence.io).",
+  "main": "index.html",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/prayashthapa/Musiverse.git"
+  },
+  "keywords": [
+    "WebGL",
+    "ThreeJS",
+    "JavaScript",
+    "Audio",
+    "Visualization",
+    "Music",
+    "Toy",
+    "Art"
+  ],
+  "author": "Prayash Thapa (effulgence.io)",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/prayashthapa/Musiverse/issues"
+  },
+  "homepage": "https://github.com/prayashthapa/Musiverse#readme"
+}

@@ -11,7 +11,7 @@ var camera, container, tick = 0, clock = new THREE.Clock(true), controls, scene,
 var cubes = [];
 var icosahedron, icosFrame, sphere;
 
-var palette = ["#ECF0F1", "#7877f9", "#3498DB", "#ffa446"];
+var palette = ["#ECF0F1", "#7877F9", "#3498DB", "#FFA446"];
 
 var notes = [ 62, 66, 69, 73, 76, 78, 81 ];
 var note = 0;
@@ -93,21 +93,16 @@ function init() {
   // * Icosahedron
   var icosGeometry = new THREE.OctahedronGeometry(350, 2);
   var icosFrameGeom = new THREE.OctahedronGeometry(400, 2);
-  var icosMaterial = new THREE.MeshPhongMaterial({
-    color: '#d92b6a',
-    shading: THREE.FlatShading,
-    vertexColors: THREE.FaceColors
-  });
 
+  var icosMaterial = new THREE.MeshPhongMaterial({ color: '#D92B6A', shading: THREE.FlatShading, vertexColors: THREE.FaceColors });
   var icosWire = new THREE.MeshPhongMaterial({ color: '#FFFFFF', transparent: true, opacity: 0.2, wireframe: true });
 
   icosahedron = new THREE.Mesh(icosGeometry, icosMaterial);
   icosFrame = new THREE.Mesh(icosFrameGeom, icosWire);
   scene.add(icosahedron); scene.add(icosFrame);
 
+  // * Icosahedral Vertex Points
   for (i in icosFrameGeom.vertices) {
-    // var vector = new THREE.Vector3(icosFrameGeom.vertices.x)
-
     var sphereG = new THREE.SphereGeometry(5, 32, 32);
     var sphereM = new THREE.MeshBasicMaterial({ color: 0xffffff });
     sphere = new THREE.Mesh(sphereG, sphereM);
@@ -116,14 +111,10 @@ function init() {
   }
 
   // * Polygons
-
   var polyGeometry = new THREE.CylinderGeometry(0, 10, 20, 4, 1);
-  var polyMaterial =  new THREE.MeshPhongMaterial({
-    color:0xffffff,
-    shading: THREE.FlatShading
-  });
+  var polyMaterial =  new THREE.MeshPhongMaterial({ color:0xffffff, shading: THREE.FlatShading });
 
-  for ( var i = 0; i < 100; i ++ ) {
+  for (var i = 0; i < 100; i++) {
     var mesh = new THREE.Mesh( polyGeometry, polyMaterial );
     mesh.position.set((Math.random() - 0.5 ) * 1000, (Math.random() - 0.5 ) * 1000, (Math.random() - 0.5 ) * 1000)
     mesh.updateMatrix();
@@ -132,7 +123,7 @@ function init() {
   }
 
   // * Cubes
-  for ( var i = 0; i < 255; i++ ) {
+  for (var i = 0; i < 255; i++) {
     var cubeGeometry = new THREE.CubeGeometry(15, 15, 15);
     var cubeMaterial = new THREE.MeshPhongMaterial({
       color: palette[Math.floor(Math.random() * palette.length)],
@@ -152,19 +143,19 @@ function init() {
   // ******************************************************************************
   // - Lights
 
-  light = new THREE.DirectionalLight(0xffffff);
-  light.position.set( 1, 1, 1 );
+  light = new THREE.DirectionalLight(0xFFFFFF);
+  light.position.set(1, 1, 1);
   scene.add(light);
 
-  light = new THREE.DirectionalLight(0x002288);
-  light.position.set( -5, -1, -10 );
+  light = new THREE.DirectionalLight(0xD92B6A);
+  light.position.set(-5, -1, -10);
   scene.add(light);
 
   light = new THREE.AmbientLight(0x222222);
   scene.add(light);
 
-  var pointLight = new THREE.PointLight( "#ffffff", 1.2, 200 );
-  pointLight.position.set( 100, 100, 100 );
+  var pointLight = new THREE.PointLight("#FFFFFF", 1.2, 200);
+  pointLight.position.set(100, 100, 100);
   scene.add( pointLight );
 
   // ******************************************************************************
@@ -181,7 +172,7 @@ function init() {
 // - Animation
 
 function render() {
-  // * Analysis Parameters
+  // * Audio Analysis
   spectrum = fft.analyze();
   waveform = fft.waveform();
   volume = 0.005 + amplitude.getLevel() * 10;
@@ -207,18 +198,19 @@ function render() {
     }
   }
 
-  camera.position.x += 0.75;
+  camera.position.x++;
   camera.position.y += 0.75;
   camera.lookAt(scene.position);
-  renderer.render(scene, camera);
 
-  // * ¡Loop!
-  requestAnimationFrame(render);
-
+  // * Event Listeners
   document.addEventListener('touchstart', onTouchStart);
   window.addEventListener('resize', onWindowResize);
   window.addEventListener('mousedown', onclick);
   document.addEventListener( 'mouseup', onMouseUp);
+
+  // * Animate
+  renderer.render(scene, camera);
+  requestAnimationFrame(render);
 }
 
 // ******************************************************************************

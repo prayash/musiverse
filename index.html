@@ -1,15 +1,22 @@
 <!DOCTYPE html>
 <html lang="EN">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
   <title>Musiverse</title>
+  <meta charset="utf-8">
+  <meta property="og:title" content="Musiverse">
+  <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
+  <meta name="author" content="Effulgence">
+  <meta name="description" content="Musiverse is an audio reactive musical toy made by Prayash Thapa (effulgence.io).">
+  <meta property="og:description" content="Musiverse is an audio reactive musical toy made by Prayash Thapa (effulgence.io).">
+
   <link type="text/css" rel="stylesheet" href="http://fonts.googleapis.com/css?family=Raleway:200,300"/>
   <link type="text/css" rel="stylesheet" href="css/stylesheet.css" />
 </head>
 
 <body>
   <div id="container"></div>
+  <!-- JavaScript -->
+  <!--build:js js/app.min.js -->
   <script type="text/javascript" src="lib/jquery-2.0.0.min.js"></script>
   <script type="text/javascript" src="lib/three.min.js"></script>
   <script type="text/javascript" src="lib/OrbitControls.js"></script>
@@ -19,7 +26,21 @@
   <script type="text/javascript" src="lib/libs/stats.min.js"></script>
   <script type="text/javascript" src="lib/p5.min.js"></script>
   <script type="text/javascript" src="lib/p5.sound.min.js"></script>
-  <!-- <script type="text/javascript" src="lib/dat.gui.min.js"></script> -->
   <script type="text/javascript" src="src/app.js"></script>
+  <!-- endbuild -->
 </body>
+
+  <!-- Analytics -->
+  <script>
+    // (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    // (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    // m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    // })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+    //
+    // ga('create', 'UA-59088313-1', 'auto');
+    // ga('send', {
+    //   hitType: 'pageview',
+    //   page: location.pathname
+    // });
+  </script>
 </html>
