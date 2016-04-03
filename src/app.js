@@ -182,26 +182,23 @@ function render() {
   // console.log(volume);
 
   if (isMinor) {
-    var notes = [ 54, 57, 62, 64, 66, 69, 73, 76, 78, 81 ];
-    var gradientVariance = Math.floor(volume * 10);
-    var red = gradientVariance;
-    var green = Math.floor(gradientVariance / 10);
-    var blue = gradientVariance;
+    var gradientVariance = Math.floor(volume * 20);
+    var red = 104 + gradientVariance;
+    var green = 144 - gradientVariance;
+    var blue = 219 - gradientVariance;
 
-    // var color = new THREE.Color("hsl(" + gradientVariance + ", 80%, 100%)");
     var color = new THREE.Color("rgb(" + red + "," + green + "," + blue + ")");
     // console.log(color);
     renderer.setClearColor(scene.fog.color.lerp(color, 0.05));
     gradientVariance += colorCounter;
   } else {
-    var notes = [ 54, 57, 62, 64, 66, 69, 73, 76, 78, 81 ];
     var gradientVariance = Math.floor(volume * 10);
     var red = gradientVariance;
     var green = Math.floor(gradientVariance / 10);
     var blue = gradientVariance;
 
     var color = new THREE.Color("rgb(252, 247, 225)");
-    console.log(color);
+    // console.log(color);
     renderer.setClearColor(scene.fog.color.lerp(color, 0.05));
     gradientVariance += colorCounter;
   }
@@ -232,7 +229,7 @@ function render() {
   }
 
   camera.position.x++;
-  camera.position.y += 0.75;
+  camera.position.y++;
   camera.lookAt(scene.position);
 
   // * Event Listeners
@@ -272,7 +269,9 @@ function onTouchStart(e) {
   }
 }
 
-// A function to play a note
+// ******************************************************************************
+// - Sound Helpers
+
 function playNote(note) {
   osc.freq(midiToFreq(note));
   envelope.play(osc, 0, 0.1);
@@ -287,11 +286,13 @@ function midiToFreq(t) {
 function toMinor() {
   isMinor = true;
   isMajor = false;
+  notes = [ 57, 58, 61, 62, 64, 65, 69, 70, 74, 77 ];
 }
 
 function toMajor() {
   isMinor = false;
   isMajor = true;
+  notes = [ 54, 57, 62, 64, 66, 69, 73, 76, 78, 81 ];
 }
 
 // ******************************************************************************
