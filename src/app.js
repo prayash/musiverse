@@ -8,12 +8,13 @@ var windowHalfY           = SCREEN_HEIGHT / 2;
 
 var camera, container, tick = 0, clock = new THREE.Clock(true), controls, scene, renderer, stats;
 
-var cubes = [];
-var icosahedron, icosFrame, sphere;
+var cubes = []; var spheres = [];
+var icosahedron, icosFrame, icosFrameGeom;
+
 
 var palette = ["#ECF0F1", "#7877F9", "#3498DB", "#FFA446"];
 
-var notes = [ 62, 66, 69, 73, 76, 78, 81 ];
+var notes = [ 54, 57, 62, 64, 66, 69, 73, 76, 78, 81 ];
 var note = 0;
 
 var osc = new p5.SinOsc();
@@ -22,12 +23,13 @@ var fft = new p5.FFT();
 var amplitude = new p5.Amplitude();
 var reverb = new p5.Reverb();
 var spectrum, waveform;
+var currFreq;
+
 
 // ********************************************************************************
 // - Initialization
 
 function init() {
-
   // * Sound
   envelope.setADSR(0.15, 0.5, 0.1, 0.5);
   envelope.setRange(0.75, 0);
@@ -44,10 +46,10 @@ function init() {
 
   // * Scene
   scene = new THREE.Scene();
-  scene.fog = new THREE.FogExp2(0x7aa8ff, 0.0011); // 0xCCCCC
+  scene.fog = new THREE.FogExp2('#7AA8FF', 0.0011); // 0xCCCCC
 
   // * Renderer
-  renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
   renderer.setClearColor(scene.fog.color);
   renderer.setPixelRatio(window.devicePixelRatio);
   renderer.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -81,7 +83,7 @@ function init() {
     geometry.vertices.push(vertex2);
 
     var line = new THREE.Line(geometry, new THREE.LineBasicMaterial({
-      color: 0xffffff,
+      color: '#FFFFFF',
       linewidth: Math.random(3),
       transparent: true,
       fog: true,
@@ -92,7 +94,7 @@ function init() {
 
   // * Icosahedron
   var icosGeometry = new THREE.OctahedronGeometry(350, 2);
-  var icosFrameGeom = new THREE.OctahedronGeometry(400, 2);
+  icosFrameGeom = new THREE.OctahedronGeometry(400, 2);
 
   var icosMaterial = new THREE.MeshPhongMaterial({ color: '#D92B6A', shading: THREE.FlatShading, vertexColors: THREE.FaceColors });
   var icosWire = new THREE.MeshPhongMaterial({ color: '#FFFFFF', transparent: true, opacity: 0.2, wireframe: true });
@@ -101,18 +103,18 @@ function init() {
   icosFrame = new THREE.Mesh(icosFrameGeom, icosWire);
   scene.add(icosahedron); scene.add(icosFrame);
 
-  // * Icosahedral Vertex Points
+  // * Icosahedral Verteces
   for (i in icosFrameGeom.vertices) {
     var sphereG = new THREE.SphereGeometry(5, 32, 32);
-    var sphereM = new THREE.MeshBasicMaterial({ color: 0xffffff });
-    sphere = new THREE.Mesh(sphereG, sphereM);
-    sphere.position.set(icosFrameGeom.vertices[i].x, icosFrameGeom.vertices[i].y, icosFrameGeom.vertices[i].z)
-    scene.add(sphere);
+    var sphereM = new THREE.MeshBasicMaterial({ color: '#FFFFFF', transparent:true, shading: THREE.FlatShading});
+    spheres.push(new THREE.Mesh(sphereG, sphereM));
+    spheres[i].position.set(icosFrameGeom.vertices[i].x, icosFrameGeom.vertices[i].y, icosFrameGeom.vertices[i].z)
+    scene.add(spheres[i]);
   }
 
   // * Polygons
   var polyGeometry = new THREE.CylinderGeometry(0, 10, 20, 4, 1);
-  var polyMaterial =  new THREE.MeshPhongMaterial({ color:0xffffff, shading: THREE.FlatShading });
+  var polyMaterial =  new THREE.MeshPhongMaterial({ color: '#FFFFFF', shading: THREE.FlatShading });
 
   for (var i = 0; i < 100; i++) {
     var mesh = new THREE.Mesh( polyGeometry, polyMaterial );
@@ -127,7 +129,7 @@ function init() {
     var cubeGeometry = new THREE.CubeGeometry(15, 15, 15);
     var cubeMaterial = new THREE.MeshPhongMaterial({
       color: palette[Math.floor(Math.random() * palette.length)],
-      specular: 0xffffff,
+      specular: '#FFFFFF',
       shininess: 20,
       reflectivity: 1.5,
       shading: THREE.FlatShading,
@@ -143,15 +145,15 @@ function init() {
   // ******************************************************************************
   // - Lights
 
-  light = new THREE.DirectionalLight(0xFFFFFF);
+  light = new THREE.DirectionalLight('#FFFFFF');
   light.position.set(1, 1, 1);
   scene.add(light);
 
-  light = new THREE.DirectionalLight(0xD92B6A);
+  light = new THREE.DirectionalLight('#D92B6A');
   light.position.set(-5, -1, -10);
   scene.add(light);
 
-  light = new THREE.AmbientLight(0x222222);
+  light = new THREE.AmbientLight('#222222');
   scene.add(light);
 
   var pointLight = new THREE.PointLight("#FFFFFF", 1.2, 200);
@@ -175,6 +177,7 @@ function render() {
   // * Audio Analysis
   spectrum = fft.analyze();
   waveform = fft.waveform();
+
   volume = 0.005 + amplitude.getLevel() * 10;
   // console.log(volume);
 
@@ -185,16 +188,21 @@ function render() {
   tick += delta;
   if (tick < 0) tick = 0;
   if (delta > 0) {
-    for(var i = 0; i < cubes.length; i++) {
-      cubes[i].scale.set(1 + volume * 0.15, 1 + volume * 0.25, 1 + volume * 0.35);
+    for(var i = 0; i < cubes.length; i++) cubes[i].scale.set(1 + volume * 0.15, 1 + volume * 0.25, 1 + volume * 0.35);
 
-      icosahedron.scale.set(1 + volume * 0.05, 1 + volume * 0.05, 1 + volume * 0.05);
-      icosahedron.rotation.x += 0.00001 + (volume * 0.00000025);
+    icosahedron.scale.set(1 + volume * 0.05, 1 + volume * 0.05, 1 + volume * 0.05);
+    icosahedron.rotation.x += 0.00001 + (volume * 0.00000025);
 
-      icosFrame.scale.set(1 + volume * 0.05, 1 + volume * 0.05, 1 + volume * 0.05);
-      icosFrame.rotation.x += 0.00001 + (volume * 0.00000025);
+    icosFrame.scale.set(1 + volume * 0.05, 1 + volume * 0.05, 1 + volume * 0.05);
+    icosFrame.rotation.x += 0.00001 + (volume * 0.00000025);
 
-      sphere.rotation.x +=  0.00001 + (volume * 0.00000025);
+    icosFrame.material.opacity = volume / 10;
+
+    for (i in spheres) {
+      // spheres[i].material.opacity = volume / 5;
+      spheres[i].scale.set(1 + volume * 0.05, 1 + volume * 0.05, 1 + volume * 0.05);
+      spheres[i].rotation.x +=  0.00001 + (volume * 0.00000025);
+      // spheres[i].position.z += volume;
     }
   }
 
@@ -235,7 +243,7 @@ function onTouchStart(e) {
   if (e.touches.length === 1) {
     console.log(e.touches[0].pageX);
     e.preventDefault();
-    playNote(notes[Math.floor(Math.random() * (6 - 0 + 1)) + 0]);
+    playNote(notes[Math.floor(Math.random() * (10 - 0 + 1)) + 0]);
   }
 }
 
@@ -246,7 +254,9 @@ function playNote(note) {
 }
 
 function midiToFreq(t) {
-  return 440 * Math.pow(2, (t - 69) / 12)
+  currFreq = 440 * Math.pow(2, (t - 69) / 12);
+  console.log('- Input: ' + t + ' - FF: ' + currFreq);
+  return currFreq;
 }
 
 // ******************************************************************************
