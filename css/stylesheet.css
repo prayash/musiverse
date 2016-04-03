@@ -7,3 +7,19 @@
 	width: 100%;
 	height: 100%;
 }
+
+#key {
+	position: absolute;
+  width: 100%;
+  text-align: center;
+	z-index: 1000;
+}
+
+button {
+	margin: 1em;
+	padding: 1em 4em;
+  background: white;
+  border: 1px solid white;
+  color: grey;
+	z-index: 1000;
+}

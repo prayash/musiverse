@@ -11,11 +11,8 @@ var camera, container, tick = 0, clock = new THREE.Clock(true), controls, scene,
 var cubes = []; var spheres = [];
 var icosahedron, icosFrame, icosFrameGeom;
 
-
-var palette = ["#ECF0F1", "#7877F9", "#3498DB", "#FFA446"];
-
+var palette = ["#ECF0F1", "#7877F9", "#3498DB", "#FFA446", "#7AA8FF"];
 var notes = [ 54, 57, 62, 64, 66, 69, 73, 76, 78, 81 ];
-var note = 0;
 
 var osc = new p5.SinOsc();
 var envelope = new p5.Env();
@@ -24,7 +21,10 @@ var amplitude = new p5.Amplitude();
 var reverb = new p5.Reverb();
 var spectrum, waveform;
 var currFreq;
+var colorCounter;
 
+var isMinor = false;
+var isMajor = true;
 
 // ********************************************************************************
 // - Initialization
@@ -46,7 +46,7 @@ function init() {
 
   // * Scene
   scene = new THREE.Scene();
-  scene.fog = new THREE.FogExp2('#7AA8FF', 0.0011); // 0xCCCCC
+  scene.fog = new THREE.FogExp2('#fcf7e1', 0.0011); // 0xCCCCC fcf7e1
 
   // * Renderer
   renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
@@ -106,7 +106,7 @@ function init() {
   // * Icosahedral Verteces
   for (i in icosFrameGeom.vertices) {
     var sphereG = new THREE.SphereGeometry(5, 32, 32);
-    var sphereM = new THREE.MeshBasicMaterial({ color: '#FFFFFF', transparent:true, shading: THREE.FlatShading});
+    var sphereM = new THREE.MeshBasicMaterial({ color: '#FFFFFF', transparent: true, shading: THREE.FlatShading});
     spheres.push(new THREE.Mesh(sphereG, sphereM));
     spheres[i].position.set(icosFrameGeom.vertices[i].x, icosFrameGeom.vertices[i].y, icosFrameGeom.vertices[i].z)
     scene.add(spheres[i]);
@@ -180,6 +180,31 @@ function render() {
 
   volume = 0.005 + amplitude.getLevel() * 10;
   // console.log(volume);
+
+  if (isMinor) {
+    var notes = [ 54, 57, 62, 64, 66, 69, 73, 76, 78, 81 ];
+    var gradientVariance = Math.floor(volume * 10);
+    var red = gradientVariance;
+    var green = Math.floor(gradientVariance / 10);
+    var blue = gradientVariance;
+
+    // var color = new THREE.Color("hsl(" + gradientVariance + ", 80%, 100%)");
+    var color = new THREE.Color("rgb(" + red + "," + green + "," + blue + ")");
+    // console.log(color);
+    renderer.setClearColor(scene.fog.color.lerp(color, 0.05));
+    gradientVariance += colorCounter;
+  } else {
+    var notes = [ 54, 57, 62, 64, 66, 69, 73, 76, 78, 81 ];
+    var gradientVariance = Math.floor(volume * 10);
+    var red = gradientVariance;
+    var green = Math.floor(gradientVariance / 10);
+    var blue = gradientVariance;
+
+    var color = new THREE.Color("rgb(252, 247, 225)");
+    console.log(color);
+    renderer.setClearColor(scene.fog.color.lerp(color, 0.05));
+    gradientVariance += colorCounter;
+  }
 
   var delta = clock.getDelta();
   controls.update(delta);
@@ -257,6 +282,16 @@ function midiToFreq(t) {
   currFreq = 440 * Math.pow(2, (t - 69) / 12);
   console.log('- Input: ' + t + ' - FF: ' + currFreq);
   return currFreq;
+}
+
+function toMinor() {
+  isMinor = true;
+  isMajor = false;
+}
+
+function toMajor() {
+  isMinor = false;
+  isMajor = true;
 }
 
 // ******************************************************************************
