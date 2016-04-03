@@ -1,26 +1,41 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="EN">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
   <title>Musiverse</title>
-  <link href="http://fonts.googleapis.com/css?family=Raleway:200,300" rel="stylesheet" type="text/css" />
-  <link href="css/stylesheet.css" rel="stylesheet" type="text/css" />
+  <meta charset="utf-8">
+  <meta property="og:title" content="Musiverse">
+  <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
+  <meta name="author" content="Effulgence">
+  <meta name="description" content="Musiverse is an audio reactive musical toy made by Prayash Thapa (effulgence.io).">
+  <meta property="og:description" content="Musiverse is an audio reactive musical toy made by Prayash Thapa (effulgence.io).">
+  <meta property="og:url" content="http://effulgence.io" />
+  <link rel="icon" type="image/png" href="favicon.ico">
+
+  <link type="text/css" rel="stylesheet" href="http://fonts.googleapis.com/css?family=Raleway:200,300"/>
+  <link type="text/css" rel="stylesheet" href="css/stylesheet.css" />
 </head>
 
 <body>
+  <div id="key">
+		<button id="major" onclick="toMajor()" ontouchstart="toMajor()">Major</button>
+		<button id="minor" onclick="toMinor()" ontouchstart="toMinor()">Minor</button>
+	</div>
   <div id="container"></div>
-  <script type="text/javascript" src="js/jquery-2.0.0.min.js"></script>
-  <!-- <script type="text/javascript" src="js/threeJS/three.min.js"></script> -->
-  <script src='https://cdnjs.cloudflare.com/ajax/libs/three.js/r73/three.min.js'></script>
-  <script type="text/javascript" src="js/threeJS/OrbitControls.js"></script>
-  <script type="text/javascript" src="js/threeJS/TrackballControls.js"></script>
-  <script type="text/javascript" src="js/threeJS/Detector.js"></script>
-  <script type="text/javascript" src="js/threeJS/GPUParticleSystem.js"></script>
-  <script type="text/javascript" src="js/threeJS/libs/stats.min.js"></script>
-  <script type="text/javascript" src="js/dat.gui.min.js"></script>
-  <script type="text/javascript" src="js/visualizer.js"></script>
-  <script type="text/javascript" src="js/audio.js"></script>
-  <script type="text/javascript" src="js/main.js"></script>
+  <!-- JavaScript -->
+  <script src="js/app.min.js"></script>
 </body>
+
+  <!-- Analytics -->
+  <script>
+    // (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    // (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    // m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    // })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+    //
+    // ga('create', 'UA-59088313-1', 'auto');
+    // ga('send', {
+    //   hitType: 'pageview',
+    //   page: location.pathname
+    // });
+  </script>
 </html>
