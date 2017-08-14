@@ -4,7 +4,7 @@ class Core {
   constructor(args) {
     this.geometry = new THREE.OctahedronGeometry(300, 2)
     this.group = this.create()
-
+    // this.nodes = this.createNodesUsingGeometry()
     return this
   }
 
@@ -34,6 +34,24 @@ class Core {
     group.add(icosFrame)
 
     return group
+  }
+
+  createNodesUsingGeometry() {
+    const g = this.geometry
+    const nodes = []
+    const nodeG = new THREE.SphereGeometry(5, 32, 32)
+    const nodeM = new THREE.MeshBasicMaterial({
+      color: '#FFFFFF',
+      transparent: true,
+      shading: THREE.FlatShading
+    })
+
+    for (var i in g.vertices) {
+      nodes.push(new THREE.Mesh(nodeG, nodeM))
+      nodes[i].position.set(g.vertices[i].x, g.vertices[i].y, g.vertices[i].z)
+    }
+
+    return nodes
   }
 }
 

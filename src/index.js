@@ -15,24 +15,7 @@ const ps = new ParticleSystem({ scene })
 
 const core = new Core()
 core.attachTo(scene)
-
-createNodesUsingGeometry(core.geometry)
-
-function createNodesUsingGeometry(g) {
-  const spheres = []
-  const sphereG = new THREE.SphereGeometry(5, 32, 32)
-  const sphereM = new THREE.MeshBasicMaterial({
-    color: '#FFFFFF',
-    transparent: true,
-    shading: THREE.FlatShading
-  })
-
-  for (var i in g.vertices) {
-    spheres.push(new THREE.Mesh(sphereG, sphereM))
-    spheres[i].position.set(g.vertices[i].x, g.vertices[i].y, g.vertices[i].z)
-    scene.add(spheres[i])
-  }
-}
+// core.createNodesUsingGeometry()
 
 let time = 0
 animate(dt => {
