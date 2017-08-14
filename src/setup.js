@@ -66,12 +66,6 @@ export default function setup(opt = {}) {
       opt
     )
   )
-  controls.rotateSpeed = 2.0
-  controls.zoomSpeed = 1
-  controls.panSpeed = 1
-  controls.dampingFactor = 0.3
-  controls.minDistance = 600
-  controls.maxDistance = 1000
 
   // Update renderer size
   window.addEventListener('resize', resize)
@@ -93,11 +87,10 @@ export default function setup(opt = {}) {
     const height = window.innerHeight
     const aspect = width / height
 
-    // update camera controls
     controls.update()
     // camera.position.fromArray(controls.position)
     // camera.up.fromArray(controls.up)
-    // target.fromArray(controls.direction).add(camera.position)
+    target.fromArray(controls.direction).add(camera.position)
     camera.lookAt(target)
 
     // Update camera matrices
