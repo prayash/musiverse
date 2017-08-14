@@ -9,7 +9,7 @@ const { renderer, camera, scene, updateControls } = setup()
 const particles = []
 
 buildIcosahedron()
-const ps = new ParticleSystem({ scene }).construct()
+const ps = new ParticleSystem({ scene })
 
 function buildIcosahedron() {
   const icosGeometry = new THREE.OctahedronGeometry(250, 2)

@@ -16,10 +16,11 @@ class ParticleSystem {
   constructor(params) {
     this.particles = []
     this.scene = params.scene
+    this.create()
     return this
   }
 
-  construct() {
+  create() {
     let i = 0
     for (var ix = 0; ix < AMOUNT_X; ix++) {
       for (var iy = 0; iy < AMOUNT_Y; iy++) {
