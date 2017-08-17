@@ -33,6 +33,22 @@ class ParticleSystem {
       }
     }
   }
+
+  wave(time) {
+    let i = 0
+    for (var ix = 0; ix < AMOUNT_X; ix++) {
+      for (var iy = 0; iy < AMOUNT_Y; iy++) {
+        let particle = this.particles[i++]
+
+        particle.position.x =
+          Math.sin((ix + time) * 0.3) * 50 + Math.sin((iy + time) * 0.5) * 50
+
+        particle.position.y =
+          (Math.sin((ix + time) * 0.3) + 1) * 4 +
+          (Math.sin((iy + time) * 0.5) + 1) * 4
+      }
+    }
+  }
 }
 
 export default ParticleSystem

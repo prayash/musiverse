@@ -103,5 +103,3 @@ export default function setup(opt = {}) {
     updateControls()
   }
 }
-
-// module.exports = setup
